@@ -6,6 +6,7 @@ export default function Home() {
   const [dateInput, setDateInput] = useState("");
   const [resultList, setResultList] = useState([]);
   const [selectedButton, setSelectedButton] = useState("");
+  const [isLoading, setIsLoading] = useState();
   const buttonList = [
   "Beach", 
   "Park", 
@@ -31,6 +32,8 @@ export default function Home() {
 
   async function onSubmit(event) {
     event.preventDefault();
+    setIsLoading(true);
+    console.log('isloading before promise return', isLoading)
     const response = await fetch("/api/promptGenerator", {
       method: "POST",
       headers: {
@@ -39,6 +42,8 @@ export default function Home() {
       body: JSON.stringify({ date: dateInput }),
     });
     const data = await response.json();
+    setIsLoading(false);
+    console.log('isloading after promise return', isLoading)
     setResultList([{prompt: dateInput, response: data.result}, ...resultList]);
     setDateInput("");
     setSelectedButton("");
@@ -64,6 +69,7 @@ export default function Home() {
               })
             }
           </div>
+
           <input
             type="text"
             name="date"
@@ -71,7 +77,13 @@ export default function Home() {
             value={dateInput}
             onChange={onChange}
           />
+
+          <div className={styles.submit}>
           <input type="submit" value="Generate Date Ideas" />
+          {
+            isLoading === true ? <p>...loading dates</p> : null
+          }
+          </div>
         </form>
 
         <div className={styles.responseSection}>
