@@ -14,7 +14,7 @@ export default function Home() {
   useEffect(() => {
     const storedDateList = localStorage.getItem("date list");
     const storedListCleared = localStorage.getItem("list cleared") === "true" ? true : false;
-    !storedListCleared ? setResultList(JSON.parse(storedDateList)) : setResultList([]);
+    !storedListCleared && storedDateList ? setResultList(JSON.parse(storedDateList)) : setResultList([]);
     setDarkMode(localStorage.getItem("dark mode") === "true" ? true : false);
   }, []);
   
