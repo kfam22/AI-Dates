@@ -9,10 +9,11 @@ export default function Home() {
   const [selectedButton, setSelectedButton] = useState("");
   const [isLoading, setIsLoading] = useState();
   const [darkMode, setDarkMode] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const storedDateList = localStorage.getItem("date list");
-    const storedDarkMode = localStorage.getItem("dark mode")
+    const storedDarkMode = localStorage.getItem("dark mode");
     storedDateList ? setResultList(JSON.parse(storedDateList)) : setResultList([]);
     setDarkMode(
       storedDarkMode === "true" || storedDarkMode === "false" ? 
@@ -43,26 +44,31 @@ export default function Home() {
     const updatedDarkMode = !darkMode;
     setDarkMode(updatedDarkMode);
     localStorage.setItem("dark mode", updatedDarkMode);
-  }
+  };
 
   function buttonClick(e) {
     e.preventDefault();
+    setError(false);
     setDateInput(e.target.value);
     setSelectedButton(e.target.value);
-  }
+  };
 
   function onChange(e) {
+    setError(false);
     setDateInput(e.target.value);
     setSelectedButton("");
-  }
+  };
 
   function clearList() {
     setResultList([]);
     localStorage.setItem("date list", []);
-  }
+  };
 
   async function onSubmit(event) {
     event.preventDefault();
+    if(!dateInput || !dateInput.trim()){
+      setError(true);
+    } else {
     setIsLoading(true);
     const response = await fetch("/api/promptGenerator", {
       method: "POST",
@@ -78,7 +84,8 @@ export default function Home() {
     localStorage.setItem("date list", JSON.stringify(updatedResultList));
     setDateInput("");
     setSelectedButton("");
-  }
+    }
+  };
 
   return (
     <div className={darkMode ? styles.darkMode : ""}>
@@ -125,6 +132,10 @@ export default function Home() {
           <input type="submit" value="Generate Date Ideas" />
           {
             isLoading === true ? <p>...loading dates</p> : null
+          }
+          {
+                        error ? <p>you must enter a valid input</p> : null
+
           }
           </div>
         </form>
