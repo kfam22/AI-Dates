@@ -8,10 +8,14 @@ export default function Home() {
   const [resultList, setResultList] = useState([]);
   const [selectedButton, setSelectedButton] = useState("");
   const [isLoading, setIsLoading] = useState();
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
+  const [listCleared, setListCleared] = useState(false);
 
   useEffect(() => {
-    setDarkMode(localStorage.getItem('dark mode') === 'true' ? true : false);
+    const storedDateList = localStorage.getItem("date list");
+    const storedListCleared = localStorage.getItem("list cleared") === "true" ? true : false;
+    !storedListCleared ? setResultList(JSON.parse(storedDateList)) : null;
+    setDarkMode(localStorage.getItem("dark mode") === "true" ? true : false);
   }, []);
   
   const buttonList = [
@@ -50,9 +54,16 @@ export default function Home() {
     setSelectedButton("");
   }
 
+  function clearList() {
+    setResultList([]);
+    setListCleared(true);
+    localStorage.setItem('list cleared', true);
+  }
+
   async function onSubmit(event) {
     event.preventDefault();
     setIsLoading(true);
+    localStorage.setItem('list cleared', false);
     const response = await fetch("/api/promptGenerator", {
       method: "POST",
       headers: {
@@ -62,7 +73,9 @@ export default function Home() {
     });
     const data = await response.json();
     setIsLoading(false);
-    setResultList([{prompt: dateInput, response: data.result}, ...resultList]);
+    let updatedResultList = [{prompt: dateInput, response: data.result}, ...resultList]
+    setResultList(updatedResultList);
+    localStorage.setItem("date list", JSON.stringify(updatedResultList));
     setDateInput("");
     setSelectedButton("");
   }
@@ -118,7 +131,11 @@ export default function Home() {
 
         <div className={styles.responseSection}>
           {
-            resultList.length > 0 ? <h2 className={styles.subtitle}>Date Ideas</h2> : null
+            resultList.length > 0 ? 
+            <div className={styles.subtitleSection}>
+              <h2 className={styles.subtitle}>Date Ideas</h2>
+              <p onClick={clearList}>clear list</p>
+            </div> : null
           }
           {
             resultList.map((res, idx) => {

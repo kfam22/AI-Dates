@@ -90,9 +90,17 @@
   width: 60%;
   border-radius: 5px;
 }
-.subtitle {
+.subtitleSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.subtitleSection h2 {
   text-align: left;
   margin-top: 2rem;
+}
+.subtitleSection p {
+  cursor: pointer;
 }
 .responseContainer {
   border-top: 1.5px solid #eb4733;
