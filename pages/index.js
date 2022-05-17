@@ -9,13 +9,15 @@ export default function Home() {
   const [selectedButton, setSelectedButton] = useState("");
   const [isLoading, setIsLoading] = useState();
   const [darkMode, setDarkMode] = useState(true);
-  const [listCleared, setListCleared] = useState(false);
 
   useEffect(() => {
     const storedDateList = localStorage.getItem("date list");
-    const storedListCleared = localStorage.getItem("list cleared") === "true" ? true : false;
-    !storedListCleared && storedDateList ? setResultList(JSON.parse(storedDateList)) : setResultList([]);
-    setDarkMode(localStorage.getItem("dark mode") === "true" ? true : false);
+    const storedDarkMode = localStorage.getItem("dark mode")
+    storedDateList ? setResultList(JSON.parse(storedDateList)) : setResultList([]);
+    setDarkMode(
+      storedDarkMode === "true" || storedDarkMode === "false" ? 
+      (storedDarkMode === "true" ? true : false) : 
+      darkMode);
   }, []);
   
   const buttonList = [
@@ -56,14 +58,12 @@ export default function Home() {
 
   function clearList() {
     setResultList([]);
-    setListCleared(true);
-    localStorage.setItem('list cleared', true);
+    localStorage.setItem("date list", []);
   }
 
   async function onSubmit(event) {
     event.preventDefault();
     setIsLoading(true);
-    localStorage.setItem('list cleared', false);
     const response = await fetch("/api/promptGenerator", {
       method: "POST",
       headers: {
@@ -81,7 +81,7 @@ export default function Home() {
   }
 
   return (
-    <div className={darkMode ? styles.darkMode : styles.lightMode}>
+    <div className={darkMode ? styles.darkMode : ""}>
       <Head>
         <title>AI Date Planner</title>
       </Head>
