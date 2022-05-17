@@ -3,6 +3,9 @@ body {
   padding: 0;
   margin: 0;
   font-family: 'Karla', sans-serif;
+  color: #353740;
+  height: 100%;
+  margin: 0;
 }
 
 a {

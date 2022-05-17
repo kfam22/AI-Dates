@@ -1,12 +1,19 @@
 import Head from "next/head";
-import { useState } from "react";
-import styles from '../styles/Home.module.css'
+import { useState, useEffect } from "react";
+import styles from '../styles/Home.module.css';
 
 export default function Home() {
+
   const [dateInput, setDateInput] = useState("");
   const [resultList, setResultList] = useState([]);
   const [selectedButton, setSelectedButton] = useState("");
   const [isLoading, setIsLoading] = useState();
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    setDarkMode(localStorage.getItem('dark mode') === 'true' ? true : false);
+  }, []);
+  
   const buttonList = [
   "Beach", 
   "Park", 
@@ -16,8 +23,21 @@ export default function Home() {
   "Festival", 
   "Concert", 
   "Museum", 
-  "Vineyard", 
-  "Boat"];
+  "Vineyard",
+  "Dog Park", 
+  "Boat",
+  "Private Jet",
+  "Water Park",
+  "Safari",
+  "Horse Race",
+  "Desert",
+  "National Park",];
+
+  function darkModeToggle() {
+    const updatedDarkMode = !darkMode;
+    setDarkMode(updatedDarkMode);
+    localStorage.setItem("dark mode", updatedDarkMode);
+  }
 
   function buttonClick(e) {
     e.preventDefault();
@@ -33,7 +53,6 @@ export default function Home() {
   async function onSubmit(event) {
     event.preventDefault();
     setIsLoading(true);
-    console.log('isloading before promise return', isLoading)
     const response = await fetch("/api/promptGenerator", {
       method: "POST",
       headers: {
@@ -43,19 +62,30 @@ export default function Home() {
     });
     const data = await response.json();
     setIsLoading(false);
-    console.log('isloading after promise return', isLoading)
     setResultList([{prompt: dateInput, response: data.result}, ...resultList]);
     setDateInput("");
     setSelectedButton("");
   }
 
   return (
-    <div>
+    <div className={darkMode ? styles.darkMode : styles.lightMode}>
       <Head>
         <title>AI Date Planner</title>
       </Head>
 
       <main className={styles.main}>
+        <div className={styles.lightModeSelector}>
+        {
+          darkMode === false ? 
+          <span 
+          className="material-symbols-rounded" 
+          onClick={() => darkModeToggle()}>dark_mode</span> : 
+          <span 
+          className="material-symbols-rounded" 
+          onClick={() => darkModeToggle()}>light_mode</span>
+        }
+        </div>
+
         <h3>Plan a Romantic Date ❤️</h3>
         <form onSubmit={onSubmit}>
           <div className={styles.buttonContainer}>
@@ -90,20 +120,19 @@ export default function Home() {
           {
             resultList.length > 0 ? <h2 className={styles.subtitle}>Date Ideas</h2> : null
           }
-          
-            {
-              resultList.map((res, idx) => {
-                return <div className={styles.responseContainer} key={idx}>
-                  <div className={styles.response}>
-                    <p>Input:</p> 
-                    <p className={styles.responseText}>Romantic date ideas that take place at the {res.prompt}</p>
-                  </div>
-
-                  <div className={styles.response}>
-                    <p>Response:</p> 
-                    <p className={styles.responseText}>{res.response}</p>
-                  </div>
+          {
+            resultList.map((res, idx) => {
+              return <div className={styles.responseContainer} key={idx}>
+                <div className={styles.response}>
+                  <p>Input:</p> 
+                  <p className={styles.responseText}>Suggestions for a romantic date at a {res.prompt}</p>
                 </div>
+
+                <div className={styles.response}>
+                  <p>Response:</p> 
+                  <p className={styles.responseText}>{res.response}</p>
+                </div>
+              </div>
               })
             }
         </div>
