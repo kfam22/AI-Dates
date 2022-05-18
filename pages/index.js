@@ -131,11 +131,9 @@ export default function Home() {
           <div className={styles.submit}>
           <input type="submit" value="Generate Date Ideas" />
           {
-            isLoading === true ? <p>...loading dates</p> : null
-          }
-          {
-                        error ? <p>you must enter a valid input</p> : null
-
+            isLoading || error ?
+            (error ? <p>you must enter a valid input</p> : <p>...loading dates</p> ) : 
+            null
           }
           </div>
         </form>
@@ -146,7 +144,8 @@ export default function Home() {
             <div className={styles.subtitleSection}>
               <h2 className={styles.subtitle}>Date Ideas</h2>
               <p onClick={clearList}>clear list</p>
-            </div> : null
+            </div> : 
+            null
           }
           {
             resultList.map((res, idx) => {
